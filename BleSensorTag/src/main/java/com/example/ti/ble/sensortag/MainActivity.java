@@ -1,4 +1,4 @@
-/**************************************************************************************************
+ /**************************************************************************************************
   Filename:       MainActivity.java
 
   Copyright (c) 2013 - 2014 Texas Instruments Incorporated
@@ -315,8 +315,6 @@ public class MainActivity extends ViewPagerActivity {
 	}
 
 	void onScanViewReady(View view) {
-
-
 		// License popup on first run
 		if (prefs.getBoolean("firstrun", true)) {
 			onLicense();
@@ -653,7 +651,8 @@ public class MainActivity extends ViewPagerActivity {
 			runOnUiThread(new Runnable() {
 				public void run() {
 					// Filter devices
-					if (checkDeviceFilter(device.getAddress())) {
+//					if (checkDeviceFilter(device.getAddress()))
+					{//TODO
 						if (!deviceInfoExists(device.getAddress())) {
 							// New device
 							BleDeviceInfo deviceInfo = createDeviceInfo(device, rssi);

@@ -160,8 +160,10 @@ import com.example.ti.util.PreferenceWR;
 		mIsSensorTag2 = false;
 		// Determine type of SensorTagGatt
 		String deviceName = mBluetoothDevice.getName();
-		if ((deviceName.equals("SensorTag2")) ||(deviceName.equals("CC2650 SensorTag"))) {
+		if ((deviceName.equals("SensorTag2")) ||(deviceName.equals("CC2650 SensorTag"))
+        || deviceName.contains(("FLC BTLE"))) {
 			mIsSensorTag2 = true;
+            Log.i("FLC BTLE", "mIsSensorTag2!!!");
 		}
 		else mIsSensorTag2 = false;
 

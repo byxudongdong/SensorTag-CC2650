@@ -187,7 +187,9 @@ public class FwUpdateActivity_CC26xx extends Activity {
 
         // Characteristics list
         mCharListOad = mOadService.getCharacteristics();
-        mCharListCc = mConnControlService.getCharacteristics();
+        if(mConnControlService != null) {
+            mCharListCc = mConnControlService.getCharacteristics();
+        }
 
         if (mTestService != null) {
             for (BluetoothGattCharacteristic b : mTestService.getCharacteristics()) {
@@ -198,12 +200,12 @@ public class FwUpdateActivity_CC26xx extends Activity {
         }
 
 
-        mServiceOk = mCharListOad.size() == 2 && mCharListCc.size() >= 3;
+        mServiceOk = mCharListOad.size() == 2 ;//&& mCharListCc.size() >= 3;
         if (mServiceOk) {
             mCharIdentify = mCharListOad.get(0);
             mCharBlock = mCharListOad.get(1);
             mCharBlock.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            mCharConnReq = mCharListCc.get(1);
+            //mCharConnReq = mCharListCc.get(1);
         }
         try {
             String fwString = mDeviceActivity.firmwareRevision();
@@ -607,8 +609,8 @@ public class FwUpdateActivity_CC26xx extends Activity {
         // Make sure connection interval is long enough for OAD (Android default connection interval is 7.5 ms)
         byte[] value = {Conversion.loUint16(OAD_CONN_INTERVAL), Conversion.hiUint16(OAD_CONN_INTERVAL), Conversion.loUint16(OAD_CONN_INTERVAL),
                 Conversion.hiUint16(OAD_CONN_INTERVAL), 0, 0, Conversion.loUint16(OAD_SUPERVISION_TIMEOUT), Conversion.hiUint16(OAD_SUPERVISION_TIMEOUT) };
-        mCharConnReq.setValue(value);
-        mLeService.writeCharacteristic(mCharConnReq);
+        //mCharConnReq.setValue(value);
+        //mLeService.writeCharacteristic(mCharConnReq);
     }
 
 

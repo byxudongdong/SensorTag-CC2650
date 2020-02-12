@@ -58,6 +58,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -71,6 +74,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -99,6 +103,7 @@ public class BluetoothLeService extends Service {
 	public final static String EXTRA_STATUS = "com.example.ti.ble.common.EXTRA_STATUS";
 	public final static String EXTRA_ADDRESS = "com.example.ti.ble.common.EXTRA_ADDRESS";
     public final static int GATT_TIMEOUT = 150;
+	private static final String CHANNEL_ID_STRING = "BLE后台服务";
 
 	// BLE
 	private BluetoothManager mBluetoothManager = null;
@@ -276,11 +281,11 @@ public class BluetoothLeService extends Service {
 
 	public boolean checkGatt() {
 		if (mBtAdapter == null) {
-			// Log.w(TAG, "BluetoothAdapter not initialized");
+			 Log.w(TAG, "BluetoothAdapter not initialized");
 			return false;
 		}
 		if (mBluetoothGatt == null) {
-			// Log.w(TAG, "BluetoothGatt not initialized");
+			 Log.w(TAG, "BluetoothGatt not initialized");
 			return false;
 		}
         if (this.blocking) {
@@ -302,6 +307,15 @@ public class BluetoothLeService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		//适配8.0service
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationChannel mChannel = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			mChannel = new NotificationChannel(CHANNEL_ID_STRING, "BLE服务", NotificationManager.IMPORTANCE_HIGH);
+			notificationManager.createNotificationChannel(mChannel);
+			Notification notification = new Notification.Builder(getApplicationContext(), CHANNEL_ID_STRING).build();
+			startForeground(1, notification);
+		}
 		return binder;
 	}
 
@@ -330,14 +344,14 @@ public class BluetoothLeService extends Service {
 		if (mBluetoothManager == null) {
 			mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 			if (mBluetoothManager == null) {
-				// Log.e(TAG, "Unable to initialize BluetoothManager.");
+				 Log.e(TAG, "Unable to initialize BluetoothManager.");
 				return false;
 			}
 		}
 
 		mBtAdapter = mBluetoothManager.getAdapter();
 		if (mBtAdapter == null) {
-			// Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+			 Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
 			return false;
 		}
 
@@ -583,7 +597,7 @@ public class BluetoothLeService extends Service {
 	 */
 	public boolean connect(final String address) {
 		if (mBtAdapter == null || address == null) {
-			// Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
+			 Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
 			return false;
 		}
 		final BluetoothDevice device = mBtAdapter.getRemoteDevice(address);
@@ -596,26 +610,26 @@ public class BluetoothLeService extends Service {
 			// Previously connected device. Try to reconnect.
 			if (mBluetoothDeviceAddress != null
 			    && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null) {
-				// Log.d(TAG, "Re-use GATT connection");
+				 Log.d(TAG, "Re-use GATT connection");
 				if (mBluetoothGatt.connect()) {
 					return true;
 				} else {
-					// Log.w(TAG, "GATT re-connect failed.");
+					 Log.w(TAG, "GATT re-connect failed.");
 					return false;
 				}
 			}
 
 			if (device == null) {
-				// Log.w(TAG, "Device not found.  Unable to connect.");
+				 Log.w(TAG, "Device not found.  Unable to connect.");
 				return false;
 			}
 			// We want to directly connect to the device, so we are setting the
 			// autoConnect parameter to false.
-			// Log.d(TAG, "Create a new GATT connection.");
+			 Log.d(TAG, "Create a new GATT connection.");
 			mBluetoothGatt = device.connectGatt(this, false, mGattCallbacks);
 			mBluetoothDeviceAddress = address;
 		} else {
-			// Log.w(TAG, "Attempt to connect in state: " + connectionState);
+			 Log.w(TAG, "Attempt to connect in state: " + connectionState);
 			return false;
 		}
 		return true;

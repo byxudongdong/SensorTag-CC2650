@@ -62,11 +62,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ti.ble.common.BluetoothLeService;
 import com.example.ti.util.CustomToast;
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by ole on 20/04/15.
@@ -143,6 +146,7 @@ public class SensorTagApplicationClass extends Application{
                     .getService();
             if (!mBluetoothLeService.initialize()) {
                 //Toast.makeText(context, "Unable to initialize BluetoothLeService", Toast.LENGTH_SHORT).show();
+                 Log.e(TAG, "Unable to initialize BluetoothLeService");
                 //finish();
                 return;
             }
@@ -171,7 +175,11 @@ public class SensorTagApplicationClass extends Application{
         boolean f;
 
         Intent bindIntent = new Intent(this, BluetoothLeService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(bindIntent);
+        } else {
         startService(bindIntent);
+        }
         f = bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         if (!f) {
             CustomToast.middleBottom(this, "Bind to BluetoothLeService failed");
